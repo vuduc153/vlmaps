@@ -121,8 +121,6 @@ def parse_object_goal_instruction(language_instr):
     text = response.choices[0].message.content
     return [x.strip() for x in text.split(",")]
 
-
-
 def parse_spatial_instruction_deprecated(language_instr):
     """
     [deprecated]: only for older version of OpenAI API
@@ -136,123 +134,123 @@ def parse_spatial_instruction_deprecated(language_instr):
     results = ""
     for lang in instructions_list:
         question = f"""
-# move a bit to the right of the refrigerator.
-robot.move_to_right('refrigerator')
-###
-# move in between the couch and bookshelf.
-robot.move_in_between('couch', 'bookshelf')
-###
-# move in the middle of the stairs and oven.
-robot.move_in_between('stairs', 'oven')
-###
-# face the toilet.
-robot.face('toilet')
-###
-# move to the south side of the table
-robot.move_south('table')
-###
-# move to the west of the chair
-robot.move_west('chair')
-###
-# move to the east of the chair
-robot.move_east('chair')
-###
-# turn left 60 degrees
-robot.turn(-60)
-###
-# turn right 20 degrees
-robot.turn(20)
-###
-# find any chairs in the environment
-robot.move_to_object('chair')
-###
-# come to the table
-robot.move_to_object('table')
-###
-# with the television on your left
-robot.with_object_on_left('television')
-###
-# with the toilet to your right, turn left 30 degrees
-robot.with_object_on_right('toilet')
-robot.turn(-30)
-###
-# with the toilet to your left, turn right 30 degrees
-robot.with_object_on_left('toilet')
-robot.turn(30)
-###
-# with the television behind you
-robot.face('television')
-robot.turn(180)
-###
-# go to the south of the table in front of you, with the table on your left, turn right 45 degrees
-robot.move_south('table')
-robot.with_object_on_left('table')
-robot.turn(45)
-###
-# move forward for 3 meters
-robot.move_forward(3)
-###
-# move right 2 meters
-robot.turn(90)
-robot.move_forward(2)
-###
-# move left 3 meters
-robot.turn(-90)
-robot.move_forward(3)
-###
-# move back and forth between the chair and the table 3 times
-pos1 = robot.get_pos('chair')
-pos2 = robot.get_pos('table')
-for i in range(3):
-    robot.move_to(pos1)
-    robot.move_to(pos2)
-###
-# go to the television
-robot.move_to_object('television')
-###
-# monitor the chair from 4 view points
-contour = robot.get_contour('chair')
-np.random.shuffle(contour)
-for pos in contour[:4]:
-    robot.move_to(pos)
-    robot.face('chair')
-###
-# navigate to 3 meters right of the table
-robot.move_to_right('table')
-robot.face('table')
-robot.turn(180)
-robot.move_forward(3)
-###
-# turn west
-robot.turn_absolute(-90)
-###
-# turn east
-robot.turn_absolute(90)
-###
-# turn south
-robot.turn_absolute(180)
-###
-# turn north
-robot.turn_absolute(0)
-###
-# turn east and then turn left 90 degrees
-robot.turn_absolute(90)
-robot.turn(-90)
-###
-# move 3 meters north of the chair
-robot.move_north('chair')
-robot.turn_absolute(0)
-robot.move_forward(3)
-###
-# move 1 meters south of the chair
-robot.move_south('chair')
-robot.turn_absolute(180)
-robot.move_forward(3)
-###
-# move 3 meters west
-robot.turn_absolute(-90)
-robot.move_forward(3)
-# {lang}
+    # move a bit to the right of the refrigerator.
+    robot.move_to_right('refrigerator')
+    ###
+    # move in between the couch and bookshelf.
+    robot.move_in_between('couch', 'bookshelf')
+    ###
+    # move in the middle of the stairs and oven.
+    robot.move_in_between('stairs', 'oven')
+    ###
+    # face the toilet.
+    robot.face('toilet')
+    ###
+    # move to the south side of the table
+    robot.move_south('table')
+    ###
+    # move to the west of the chair
+    robot.move_west('chair')
+    ###
+    # move to the east of the chair
+    robot.move_east('chair')
+    ###
+    # turn left 60 degrees
+    robot.turn(-60)
+    ###
+    # turn right 20 degrees
+    robot.turn(20)
+    ###
+    # find any chairs in the environment
+    robot.move_to_object('chair')
+    ###
+    # come to the table
+    robot.move_to_object('table')
+    ###
+    # with the television on your left
+    robot.with_object_on_left('television')
+    ###
+    # with the toilet to your right, turn left 30 degrees
+    robot.with_object_on_right('toilet')
+    robot.turn(-30)
+    ###
+    # with the toilet to your left, turn right 30 degrees
+    robot.with_object_on_left('toilet')
+    robot.turn(30)
+    ###
+    # with the television behind you
+    robot.face('television')
+    robot.turn(180)
+    ###
+    # go to the south of the table in front of you, with the table on your left, turn right 45 degrees
+    robot.move_south('table')
+    robot.with_object_on_left('table')
+    robot.turn(45)
+    ###
+    # move forward for 3 meters
+    robot.move_forward(3)
+    ###
+    # move right 2 meters
+    robot.turn(90)
+    robot.move_forward(2)
+    ###
+    # move left 3 meters
+    robot.turn(-90)
+    robot.move_forward(3)
+    ###
+    # move back and forth between the chair and the table 3 times
+    pos1 = robot.get_pos('chair')
+    pos2 = robot.get_pos('table')
+    for i in range(3):
+        robot.move_to(pos1)
+        robot.move_to(pos2)
+    ###
+    # go to the television
+    robot.move_to_object('television')
+    ###
+    # monitor the chair from 4 view points
+    contour = robot.get_contour('chair')
+    np.random.shuffle(contour)
+    for pos in contour[:4]:
+        robot.move_to(pos)
+        robot.face('chair')
+    ###
+    # navigate to 3 meters right of the table
+    robot.move_to_right('table')
+    robot.face('table')
+    robot.turn(180)
+    robot.move_forward(3)
+    ###
+    # turn west
+    robot.turn_absolute(-90)
+    ###
+    # turn east
+    robot.turn_absolute(90)
+    ###
+    # turn south
+    robot.turn_absolute(180)
+    ###
+    # turn north
+    robot.turn_absolute(0)
+    ###
+    # turn east and then turn left 90 degrees
+    robot.turn_absolute(90)
+    robot.turn(-90)
+    ###
+    # move 3 meters north of the chair
+    robot.move_north('chair')
+    robot.turn_absolute(0)
+    robot.move_forward(3)
+    ###
+    # move 1 meters south of the chair
+    robot.move_south('chair')
+    robot.turn_absolute(180)
+    robot.move_forward(3)
+    ###
+    # move 3 meters west
+    robot.turn_absolute(-90)
+    robot.move_forward(3)
+    # {lang}
     """
         print("lang: ", lang)
         response = openai.Completion.create(

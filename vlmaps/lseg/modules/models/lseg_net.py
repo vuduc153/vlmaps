@@ -307,7 +307,7 @@ class LSegEnc(BaseModel):
 
         text = text.to(x.device)
         self.logit_scale = self.logit_scale.to(x.device)
-        text_features = self.clip_pretrained.encode_text(text)
+        text_features = self.clip_pretrained.encode_text(text).half() # TODO: temp fix for CPU -- confirm if necessary for GPU
 
         image_features = self.scratch.head1(path_1)
 
