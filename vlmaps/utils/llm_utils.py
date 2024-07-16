@@ -1,5 +1,6 @@
 import os
 import openai
+from vlmaps.utils.prompt.template import PromptTemplate
 
 
 def parse_object_goal_instruction_deprecated(language_instr):
@@ -351,6 +352,39 @@ def parse_spatial_instruction(language_instr):
         if text:
             results += text + "\n"
     return text
+
+def parse_object_goal_instruction_with_scene_graph(language_instr):
+    import openai
+
+    openai_key = os.environ["OPENAI_KEY"]
+    openai.api_key = openai_key
+    instructions_list = [language_instr]
+    results = ""
+
+    for lang in instructions_list:
+        client = openai.OpenAI(api_key=openai_key)
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": PromptTemplate.SYSTEM_PROMPT},
+                {"role": "user", "content": PromptTemplate.EXAMPLE_1},
+                {"role": "assistant", "content": PromptTemplate.RESPONSE_1},
+                {"role": "user", "content": PromptTemplate.EXAMPLE_2},
+                {"role": "assistant", "content": PromptTemplate.RESPONSE_2},
+                {"role": "user", "content": PromptTemplate.EXAMPLE_3},
+                {"role": "assistant", "content": PromptTemplate.RESPONSE_3},
+                {"role": "user", "content": lang},
+            ],
+            # max_tokens=300,
+            response_format={ "type": "json_object" }
+        )
+        text = response.choices[0].message.content
+        if text:
+            results += text + "\n"
+    return text
+
+
 if __name__ == '__main__':
+
     text = parse_spatial_instruction("go to the sofa, turn right and move in between the table and the chair, and then move back and forth to the keyboard and the screen twice")
     print(text)
