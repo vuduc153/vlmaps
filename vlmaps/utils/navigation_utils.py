@@ -5,6 +5,9 @@ import pyvisgraph as vg
 import matplotlib.pyplot as plt
 from PIL import Image
 from typing import Tuple, List, Dict
+from math import atan2, degrees
+from shapely.ops import unary_union
+from shapely.geometry.polygon import Polygon
 
 
 def get_segment_islands_pos(segment_map, label_id, detect_internal_contours=False):
@@ -22,6 +25,10 @@ def get_segment_islands_pos(segment_map, label_id, detect_internal_contours=Fals
         tmp_1 = np.stack([tmp[:, 1], tmp[:, 0]], axis=1)
         contours_list.append(tmp_1)
 
+    # filter out invalid polygons & merge overlapping
+    contours_list = [contour for contour in contours_list if len(contour) >= 3]
+    contours_list = merge_overlapping_contours(contours_list)
+    
     centers_list = []
     bbox_list = []
     for c in contours_list:
@@ -34,6 +41,24 @@ def get_segment_islands_pos(segment_map, label_id, detect_internal_contours=Fals
         centers_list.append([(xmin + xmax) / 2, (ymin + ymax) / 2])
 
     return contours_list, centers_list, bbox_list, hierarchy
+
+
+def merge_overlapping_contours(contour_list):
+    polygons = []
+        
+    for contour in contour_list:
+        polygon = Polygon(contour)
+        polygons.append(polygon)
+
+    merged = unary_union(polygons)
+    
+    new_contours = []
+
+    for polygon in merged.geoms:
+        exterior_coords = np.array(polygon.exterior.coords, dtype=np.int32)
+        new_contours.append(exterior_coords)
+
+    return new_contours
 
 
 def find_closest_points_between_two_contours(obs_map, contour_a, contour_b):
@@ -108,19 +133,17 @@ def build_visgraph_with_obs_map(obs_map, use_internal_contour=False, internal_po
         for [row, col] in contour:
             contour_pos.append(vg.Point(row, col))
         poly_list.append(contour_pos)
-        xlist = [x.x for x in contour_pos]
-        zlist = [x.y for x in contour_pos]
+        
         if vis:
-            # plt.plot(xlist, zlist)
-
             cv2.waitKey()
+
     g = vg.VisGraph()
     g.build(poly_list, workers=4)
     return g
 
 
 def get_nearby_position(goal: Tuple[float, float], G: vg.VisGraph) -> Tuple[float, float]:
-    for dr, dc in zip([-1, 1, -1, 1], [-1, -1, 1, 1]):
+    for dr, dc in zip([-10, 10, -10, 10], [-10, -10, 10, 10]):
         goalvg_new = vg.Point(goal[0] + dr, goal[1] + dc)
         poly_id_new = G.point_in_polygon(goalvg_new)
         if poly_id_new == -1:
@@ -196,6 +219,45 @@ def plan_to_pos_v2(start, goal, obstacles, G: vg.VisGraph = None, vis=False):
 
     return path
 
+
+def get_goal_coordinate(start, goal, obstacles, G: vg.VisGraph = None, vis=False):
+    """
+    plan a path on a cropped obstacles map represented by a graph.
+    Start and goal are tuples of (row, col) in the map.
+    """
+
+    print("start: ", start)
+    print("goal: ", goal)
+
+    goalvg = vg.Point(goal[0], goal[1])
+    poly_id = G.point_in_polygon(goalvg)
+
+    if obstacles[int(goal[0]), int(goal[1])] == 0:
+        print("goal in obstacles")
+        try:
+            goalvg = G.closest_point(goalvg, poly_id, length=10)
+        except:
+            goal_new = get_nearby_position(goal, G)
+            goalvg = vg.Point(goal_new[0], goal_new[1])
+
+        print("goalvg: ", goalvg)
+
+    if vis:
+        obs_map_vis = (obstacles[:, :, None] * 255).astype(np.uint8)
+        obs_map_vis = np.tile(obs_map_vis, [1, 1, 3])
+        
+        obs_map_vis = cv2.circle(obs_map_vis, (int(start[1]), int(start[0])), 5, (0, 255, 0), -1)
+        obs_map_vis = cv2.circle(obs_map_vis, (int(goal[1]), int(goal[0])), 5, (0, 0, 255), -1)
+        obs_map_vis = cv2.circle(obs_map_vis, (int(goalvg.y), int(goalvg.x)), 5, (255, 0, 0), -1)
+
+        seg = Image.fromarray(obs_map_vis)
+        cv2.imshow("planned path", obs_map_vis)
+        cv2.waitKey()
+
+    theta_rad = atan2(goalvg.y - goal[1], goalvg.x - goal[0])
+    theta_deg = degrees(theta_rad)
+
+    return [goalvg.x, goalvg.y, theta_deg]
 
 def get_bbox(center, size):
     """

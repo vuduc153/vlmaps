@@ -22,16 +22,21 @@ def main(config: DictConfig) -> None:
     robot = LangRobot(config.params)
     # generate obstacles map based on occupancy within a height range
     robot.load_scene_map(data_dirs[config.scene_id], config.map_config)
-    obs_map = robot.map.obstacles_cropped
+
+    # change the default values in h_max & h_min in vlmaps.map.map.generate_obstacle_map to filter point clouds within the desired height range for obstacle map
+    obs_map = robot.map.obstacles_map
     obs_map = obs_map.astype(np.uint8) * 255
+
+    # save obstacle map
+    # cv2.imwrite(str(data_dirs[config.scene_id] / 'og.pgm'), obs_map)
+
     cv2.imshow("obs_map", obs_map)
     cv2.waitKey()
 
-    # customize obstacles map
-    robot.map.customize_obstacle_map(
-        config.map_config.potential_obstacle_names, config.map_config.obstacle_names, vis=True
-    )
-
+    # generate obstacle map based on semantic categories
+    # robot.map.customize_obstacle_map(
+    #     config.map_config.potential_obstacle_names, config.map_config.obstacle_names, vis=True
+    # )
 
 if __name__ == "__main__":
     main()
