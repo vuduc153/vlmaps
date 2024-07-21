@@ -85,21 +85,6 @@ def main(config: DictConfig) -> None:
 
 	print(robot.goals)
 
-	# tar_hab_tf = cvt_pose_vec2tf(robot.vlmaps_dataloader.base_poses[800])
-	# robot.set_agent_state(tar_hab_tf)
-	# obs = robot.sim.get_sensor_observations(0)
-	# rgb = obs["color_sensor"]
-	# bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
-	# cv2.imshow("tar rgb", bgr)
-	# cv2.waitKey()
-
-	# robot.set_agent_state(hab_tf)
-	# robot.vlmaps_dataloader.from_habitat_tf(tar_hab_tf)
-	# tar_row, tar_col, tar_angle_deg = robot.vlmaps_dataloader.to_full_map_pose()
-	# robot.empty_recorded_actions()
-	# robot.pass_goal_tf([tar_hab_tf])
-	# robot.move_to((tar_row, tar_col))
-
 
 if __name__ == "__main__":
 	main()
