@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
+import math
 
 import cv2
 import numpy as np
@@ -202,7 +203,16 @@ class Map:
         # Extract the nearest point's coordinates as a tuple
         nearest_coords = [int(nearest.x), int(nearest.y)]
 
-        return nearest_coords
+        # Move the goal by 10 units away from the object
+        vector = [coord[0] - nearest_coords[0], coord[1] - nearest_coords[1]]
+        length_vector = math.sqrt(vector[0]**2 + vector[1]**2)
+
+        if length_vector:
+            unit_vector = [vector[0] / length_vector, vector[1] / length_vector]
+        else:
+            unit_vector = [0, 0]
+
+        return [nearest_coords[0] + unit_vector[0] * 10, nearest_coords[1] + unit_vector[1] * 10]
 
     def get_forward_pos(self, curr_pos: List[float], curr_angle_deg: float, meters: float) -> List[float]:
         i, j = curr_pos
