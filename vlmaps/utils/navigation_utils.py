@@ -254,7 +254,7 @@ def get_goal_coordinate(start, goal, obstacles, G: vg.VisGraph = None, vis=False
         cv2.imshow("planned path", obs_map_vis)
         cv2.waitKey()
 
-    theta_rad = atan2(goalvg.y - goal[1], goalvg.x - goal[0])
+    theta_rad = atan2(goal[1] - goalvg.y, goal[0]- goalvg.x)
     theta_deg = degrees(theta_rad)
 
     return [goalvg.x, goalvg.y, theta_deg]
