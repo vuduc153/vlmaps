@@ -43,7 +43,7 @@ class Navigator:
         return tuple(coordinate)
 
     def shift_path(self, paths: List[List[float]], row_shift: int, col_shift: int) -> List[List[float]]:
-        return [self.shift_point(point) for point in paths]
+        return [self.shift_point(point, row_shift, col_shift) for point in paths]
 
     def shift_point(self, point: List[float], row_shift: int, col_shift: int) -> List[float]:
         return [point[0] + row_shift, point[1] + col_shift]
