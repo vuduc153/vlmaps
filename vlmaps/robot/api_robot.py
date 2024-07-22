@@ -78,10 +78,10 @@ def main(config: DictConfig) -> None:
 	robot.map.init_categories(mp3dcat[1:-1])
 	   
 	robot.set_curr_pose((284, 94, 0))
-	robot.move_to_object('table')
+	robot.move_to_object('mirror')
 
 	robot.move_to_object('tv_monitor')
-	robot.with_object_on_left('mirror')
+	robot.with_object_on_left('table')
 
 	print(robot.goals)
 

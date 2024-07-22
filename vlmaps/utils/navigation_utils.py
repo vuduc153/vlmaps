@@ -17,7 +17,7 @@ def get_segment_islands_pos(segment_map, label_id, detect_internal_contours=Fals
     if detect_internal_contours:
         detect_type = cv2.RETR_TREE
 
-    contours, hierarchy = cv2.findContours(mask, detect_type, cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(mask, detect_type, cv2.CHAIN_APPROX_NONE)
     # convert contours back to numpy index order
     contours_list = []
     for contour in contours:
@@ -25,9 +25,9 @@ def get_segment_islands_pos(segment_map, label_id, detect_internal_contours=Fals
         tmp_1 = np.stack([tmp[:, 1], tmp[:, 0]], axis=1)
         contours_list.append(tmp_1)
 
-    # filter out invalid polygons & merge overlapping
-    contours_list = [contour for contour in contours_list if len(contour) >= 3]
-    contours_list = merge_overlapping_contours(contours_list)
+    # filter out small polygons
+    contours_list = [contour for contour in contours_list if len(contour) >= 10]
+    # contours_list = merge_overlapping_contours(contours_list)
     
     centers_list = []
     bbox_list = []
