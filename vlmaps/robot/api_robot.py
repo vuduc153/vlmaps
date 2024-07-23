@@ -7,12 +7,16 @@ import hydra
 from pathlib import Path
 import cv2
 import numpy as np 
+from scipy.spatial.transform import Rotation
+from math import radians
+import json
 
 
 class ApiRobot(LangRobot):
 
 	def __init__(self, config: DictConfig):
 		super().__init__(config)
+		self.cs = self.config["params"]["cs"]
 		self.goals = []
 		self.nav = Navigator()
 
@@ -43,7 +47,7 @@ class ApiRobot(LangRobot):
 		robot_pose = self.get_agent_pose_on_map()  # (row, col, angle_deg) on full map
 
 		goal = self.nav.go_to(
-			robot_pose[:2], pos, vis=True
+			robot_pose[:2], pos, vis=False
 		)  # take (row, col) in full map
 
 		self.goals.append(goal)
@@ -60,6 +64,23 @@ class ApiRobot(LangRobot):
 		robot_pose = self.get_agent_pose_on_map()  # (row, col, angle_deg) on full map
 
 		self.goals.append(robot_pose)
+
+	def get_formatted_goals(self):
+		coordinates = []
+
+		for goal in self.goals:
+			rotation = Rotation.from_euler('xyz', [0, 0, goal[2]])
+			quaternion = rotation.as_quat()
+			qx, qy, qz, qw = quaternion
+			coordinates.append([goal[0]*self.cs, goal[1]*self.cs, 0, qx, qy, qz, qw])
+
+		data = {
+			'movements': [
+				{"actor": "A", "target": {"label": "", "coordinate": coordinate, "additional_detail": ""}} for coordinate in coordinates
+			]
+		}
+
+		return json.dumps(data)
 
 
 @hydra.main(
@@ -83,7 +104,7 @@ def main(config: DictConfig) -> None:
 	robot.move_to_object('tv_monitor')
 	robot.with_object_on_left('table')
 
-	print(robot.goals)
+	print(robot.get_formatted_goals())
 
 
 if __name__ == "__main__":

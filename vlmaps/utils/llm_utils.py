@@ -280,7 +280,7 @@ def parse_spatial_instruction(language_instr):
     for lang in instructions_list:
         client = openai.OpenAI(api_key=openai_key)
         response = client.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "user", "content": "move a bit to the right of the refrigerator"},
                 {"role": "assistant", "content": "robot.move_to_right('refrigerator')"},

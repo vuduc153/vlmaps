@@ -138,7 +138,7 @@ def build_visgraph_with_obs_map(obs_map, use_internal_contour=False, internal_po
             cv2.waitKey()
 
     g = vg.VisGraph()
-    g.build(poly_list, workers=4)
+    g.build(poly_list, workers=8)
     return g
 
 
