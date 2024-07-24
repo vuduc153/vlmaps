@@ -1,4 +1,7 @@
 from aiohttp import web
+from aiohttp_middlewares import cors_middleware
+from aiohttp_middlewares.cors import DEFAULT_ALLOW_HEADERS
+import re
 import logging
 import time
 import json
@@ -35,7 +38,17 @@ async def parse_speech(request):
 
 
 async def init():
-    app = web.Application()
+    # app = web.Application(
+    #     middlewares=[
+    #         cors_middleware(
+    #             origins=[re.compile(r"^https?\:\/\/localhost")]
+    #         )
+    #     ]
+    # )
+    # Unsecure config
+    app = web.Application(
+        middlewares=[cors_middleware(allow_all=True)]
+    )
     app.router.add_post('/parse', parse_speech)
     return app
 
