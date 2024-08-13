@@ -69,6 +69,13 @@ def pool_3d_rgb_to_2d(rgb: np.ndarray, grid_pos: np.ndarray, gs: int) -> np.ndar
 
     return rgb_2d
 
+def pool_3d_heatmap_to_2d(heat, grid_pos, gs):
+    heat_2d = np.zeros((gs, gs), dtype=np.float16)
+    for i, pos in enumerate(grid_pos):
+        row, col, h = pos
+        heat_2d[row, col] = heat[i] or heat_2d[row, col]
+
+    return heat_2d
 
 def get_heatmap_from_mask_2d(mask: np.ndarray, cell_size: float = 0.05, decay_rate: float = 0.01) -> np.ndarray:
     dists = distance_transform_edt(mask == 0) / cell_size
