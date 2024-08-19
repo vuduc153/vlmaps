@@ -1,6 +1,10 @@
-class PromptTemplate:
+from vlmaps.utils.prompt.scene_graph import SCENE_GRAPH
 
-	EXAMPLE_SCENE_GRAPH = """
+class PromptTemplate:
+    
+    EMPTY_TOKEN = "<empty>"
+
+    EXAMPLE_SCENE_GRAPH = """
 {
     "function": "office building",
     "additional_detail": "",
@@ -13,7 +17,7 @@ class PromptTemplate:
                 {
                     "class_": "workstation",
                     "coordinate": [-2.1466, 1.6935, 0.0362, 0.000, 0.000, 0.6610, 0.9211],
-                    "additional_detail": "Dan's workstation"
+                    "additional_detail": ""
                 }, {
                     "class_": "camera",
                     "coordinate": [3.1166, 0.6935, 0.0362, 0.000, 0.000, 0.5910, 0.5121],
@@ -41,37 +45,38 @@ class PromptTemplate:
 }
 """
 
-	SYSTEM_PROMPT = "You will be provided with the information about a physical space under `=== SCENE REPRESENTATION ===`, the information about a conversation dialogue under `=== PAST DIALOGUE ===` and `=== CURRENT DIALOGUE ===`, \
-	and the positions of the speakers. Use the information to deduce the expected sequence of follow-up movements for the speakers. Your output must be in JSON format. All values in the output must come from `=== SCENE REPRESENTATION ===`."
+    SYSTEM_PROMPT = "You are an intelligent assistant which can infer likely follow-up locomotion actions from a transcript of a dialogue between two humans. \
+		You will be provided with both the complete transcript of the dialogue history up until the present to use as context, and the real-time transcript of the current live conversation. \
+        The dialogue history will be marked with <dialogue_history> token and the current conversation will be marked with <current_conversation> token. \
+        You will also be provided with a textual description of the physical space of the two people, which will be marked with <scene_representation> token. \
+        The locations of the speakers when the dialogues were spoken will also be provided for temporal context. Use the information to infer the most likely follow-up movements for the speakers. \
+        Only output valid JSON and nothing else. All coordinate values in the output must come from <scene_representation> or past locations."
 
-
-	EXAMPLE_1 = f"""
-=== SCENE REPRESENTATION ===
+    EXAMPLE_1 = f"""
+<scene_representation>
 {EXAMPLE_SCENE_GRAPH}
-=== PAST DIALOGUE ===
+<dialogue_history>
 Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
-A: "Morning! Did you get a chance to look over the figures I sent yesterday?"
-B: "Hi! Yes, I did. Your projections are solid, but I think we need to double-check the data source for Q2. It seems a bit off."
-=== CURRENT DIALOGUE ===
+A: Morning! 
+A: Did you get a chance to look over the figures I sent yesterday?
+B: Hi! 
+B: Yes, I did. 
+B: Your projections are solid, but I think we need to double-check the data source for Q2. 
+B: It seems a bit off.
+<current_conversation>
 Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
-A: "Good point. How about we go pull out the original reports? It's the best way to verify the numbers."
-B: "Agreed. Let's head there. We might find more insights with the raw data in hand."
-A: "Perfect. I'll go grab the keys to the archives. Last time, some of the files were mislabeled, so it might take a bit of digging."
+B: Can you bring me the original reports?
+B: It's the best way to verify the numbers.
+A: Okay.
+A: I'll be right back.
 """
 
-	RESPONSE_1 = """
-A and B will go get the reports in the archives at [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121] together after this; but before that, A will have to go to get the keys to the archives at [-1.1576, 2.4935, 0.0362, 0.000, 0.000, 0.4310, 0.2111]. So the answer will be:
+    RESPONSE_1 = """
+From the dialogue, it can be inferred that A will go get the reports in the archives at [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121] after this; while B will stay at the current location [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211]. 
+After getting the report, A will bring them back to B. So the answer will be:
 {
     movements: 
     [{
-        "actor": "A",
-        "target": {
-            "label": "keys",
-            "coordinate": [-1.1576, 2.4935, 0.0362, 0.000, 0.000, 0.4310, 0.2111],
-            "additional_detail": "key to the archives"
-        }
-    }, 
-    {
         "actor": "A",
         "target": {
             "label": "reports",
@@ -80,50 +85,9 @@ A and B will go get the reports in the archives at [1.3114, 0.7123, 0.2313, 0.00
         }
     },
     {
-        "actor": "B",
+        "actor": "A",
         "target": {
-            "label": "reports",
-            "coordinate": [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121],
-            "additional_detail": ""
-        }
-    }]
-}
-"""
-
-	EXAMPLE_2 = f"""
-=== SCENE REPRESENTATION ===
-{EXAMPLE_SCENE_GRAPH}
-=== PAST DIALOGUE ===
-Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
-A: "Morning! Did you get a chance to look over the figures I sent yesterday?"
-B: "Hi! Yes, I did. Your projections are solid, but I think we need to double-check the data source for Q2. It seems a bit off."
-Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
-A: "Good point. How about we go pull out the original reports? It's the best way to verify the numbers."
-B: "Agreed. Let's head there. We might find more insights with the raw data in hand."
-A: "Perfect. I'll go grab the keys to the archives. Last time, some of the files were mislabeled, so it might take a bit of digging."
-=== CURRENT DIALOGUE ===
-Location (1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121)
-B: "The numbers are matching up. Looks like our initial analysis was correct. This is a relief."
-A: "Great work! I'll stay here a bit longer to reorganize these files for next time. Could you take the verified reports back up?"
-B: "Sure thing. I will put the keys back when I’m at it. See you back upstairs.”
-"""
-
-	RESPONSE_2 = """
-A and B were originally at [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211], and B will be returning there, but not before returning the keys to their original location at [-1.1576, 2.4935, 0.0362, 0.000, 0.000, 0.4310, 0.2111]. A will stay in the new location, so the answer will be: 
-{
-    movements:
-    [{
-        "actor": "B",
-        "target": {
-            "label": "keys",
-            "coordinate": [-1.1576, 2.4935, 0.0362, 0.000, 0.000, 0.4310, 0.2111],
-            "additional_detail": "key to the archives"
-        }
-    }, 
-    {
-        "actor": "B",
-        "target": {
-            "label": "",
+            "label": "B",
             "coordinate": [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211],
             "additional_detail": ""
         }
@@ -131,59 +95,83 @@ A and B were originally at [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.921
 }
 """
 
-	EXAMPLE_3 = f"""
-=== SCENE REPRESENTATION ===
+    EXAMPLE_2 = f"""
+<scene_representation>
 {EXAMPLE_SCENE_GRAPH}
-=== CURRENT DIALOGUE ===
+<dialogue_history>
 Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
-A: "Morning! Did you get a chance to look over the figures I sent yesterday?"
-B: "Hi! Yes, I did. Your projections are solid. Great work!"
+A: Morning! 
+A: Did you get a chance to look over the figures I sent yesterday?
+B: Hi! 
+B: Yes, I did. 
+B: Your projections are solid, but I think we need to double-check the data source for Q2. 
+B: It seems a bit off.
+Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
+B: Can you bring me the original reports?
+B: It's the best way to verify the numbers.
+A: Okay.
+A: I'll be right back.
+<current_conversation>
+Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
+B: Thanks a lot!
+B: The numbers are matching up. 
+B: Looks like our initial analysis was correct.
+A: That's good.
+B: Next, can you help me go have a look at the data on my workstation.
+B: There should be some numbers at the bottom right corner of the screen that you may have insights on.
+B: Then again please come back here when you're done.
+A: Okay got it. 
 """
 
-	RESPONSE_3 = "Since there's no indication that either A or B will move to a new location after this, the answer will be: {movements: []}"
-
-	TEMP_SCENE_GRAPH = """
+    RESPONSE_2 = """
+From the dialogue, it can be inferred that A will go to the workstation at [-2.1466, 1.6935, 0.0362, 0.000, 0.000, 0.6610, 0.9211] to look at the data; while B will still stay at the current location [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211]. 
+After looking at the data, A will need to go report the findings back to B. So the answer will be:
 {
-    "function": "office building",
-    "additional_detail": "Melbourne Connect",
-    "rooms": [
-        {
-            "coordinate": [5.7326, 7.0397, 0.0762, 0.0000, 0.0000, -0.8627, 0.5057],
-            "scene_category": "IxT lab",
-            "additional_detail": "Interactive user interface laboratory",
-            "objects": [
-                {
-                    "class_": "workstation",
-                    "coordinate": [-1.3229, 3.2359, 0.0762, 0.0000, 0.0000, -0.4356, 0.9001],
-                    "additional_detail": "Dan's workstation"
-                }, {
-                    "class_": "tv",
-                    "coordinate": [2.8889, 6.7676, 0.0762, 0.0000, 0.0000, 0.4850, 0.8745],
-                    "additional_detail": "big display"
-                }, {
-                    "class_": "3d printer",
-                    "coordinate": [1.0564, 1.1280, 0.0762, 0.0000, 0.0000, -0.4669, 0.8843],
-                    "additional_detail": "can be used for students' projects"
-                },
-                {
-                    "class_": "mirror",
-                    "coordinate": [-1.4979, 6.2643, 0.0762, 0.0000, 0.0000, 0.8149, 0.5796],
-                    "additional_detail": ""
-                }
-            ]
+    movements:
+    [{
+        "actor": "A",
+        "target": {
+            "label": "workstation",
+            "coordinate": [-2.1466, 1.6935, 0.0362, 0.000, 0.000, 0.6610, 0.9211],
+            "additional_detail": ""
         }
-    ]
+    }, 
+    {
+        "actor": "A",
+        "target": {
+            "label": "B",
+            "coordinate": [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211],
+            "additional_detail": ""
+        }
+    }]
 }
 """
-	
-	@staticmethod
-	def build_prompt(past_dialogue, current_dialogue):
-		prompt = f"""
-=== SCENE REPRESENTATION ===
-{PromptTemplate.TEMP_SCENE_GRAPH}
-=== PAST DIALOGUE ===
-{past_dialogue}
-=== CURRENT DIALOGUE ===
+
+    EXAMPLE_3 = f"""
+<scene_representation>
+{EXAMPLE_SCENE_GRAPH}
+<dialogue_history>
+{EMPTY_TOKEN}
+<current_conversation>
+Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
+A: Morning! 
+A: Did you get a chance to look over the figures I sent yesterday?
+B: Hi! 
+B: Yes, I did. 
+B: Your projections are solid. 
+B: Great work!
+"""
+
+    RESPONSE_3 = "Since there's no indication that either A or B will move to a new location after this, the answer will be: {movements: []}"
+    
+    @staticmethod
+    def build_prompt(past_dialogue, current_dialogue):
+        prompt = f"""
+<scene_representation>
+{SCENE_GRAPH}
+<dialogue_history>
+{past_dialogue if past_dialogue else PromptTemplate.EMPTY_TOKEN}
+<current_conversation>
 {current_dialogue}
 """
-		return prompt
+        return prompt
