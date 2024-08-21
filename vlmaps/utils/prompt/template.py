@@ -87,7 +87,7 @@ After getting the report, A will bring them back to B. So the answer will be:
     {
         "actor": "A",
         "target": {
-            "label": "B",
+            "label": "return",
             "coordinate": [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211],
             "additional_detail": ""
         }
@@ -139,7 +139,7 @@ After looking at the data, A will need to go report the findings back to B. So t
     {
         "actor": "A",
         "target": {
-            "label": "B",
+            "label": "return",
             "coordinate": [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211],
             "additional_detail": ""
         }
