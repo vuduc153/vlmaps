@@ -164,6 +164,69 @@ B: Great work!
 
     RESPONSE_3 = "Since there's no indication that either A or B will move to a new location after this, the answer will be: {movements: []}"
     
+    EXAMPLE_4 = f"""
+<scene_representation>
+{EXAMPLE_SCENE_GRAPH}
+<dialogue_history>
+Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
+A: Morning! 
+A: Did you get a chance to look over the figures I sent yesterday?
+B: Hi! 
+B: Yes, I did. 
+B: Your projections are solid, but I think we need to double-check the data source for Q2. 
+B: It seems a bit off.
+Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
+B: Can you bring me the original reports?
+B: It's the best way to verify the numbers.
+A: Okay.
+A: I'll be right back.
+Location (-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211)
+B: Thanks a lot!
+B: The numbers are matching up. 
+B: Looks like our initial analysis was correct.
+A: That's good.
+B: Next, can you help me go have a look at the data on my workstation.
+B: There should be some numbers at the bottom right corner of the screen that you may have insights on.
+B: Then again please come back here when you're done.
+A: Okay got it.
+<current_conversation>
+B: Sorry, I didn't notice but it looks like we missed a report for last year's revenue.
+B: Could you go back to where you got the reports earlier and see if there's another one there somewhere?
+B: I'll be waiting for you at the storage room.
+"""
+
+    RESPONSE_4 = """
+From the dialogue, it can be inferred that A will return to the report's location at [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121] again to check if there is a missing report, while B will be going to the storage room at [-2.1866, 1.6935, 0.0162, 0.000, 0.000, 0.3310, 0.5311].
+After double-checking for the missing report, A will go and find B at the new location. So the answer will be:
+{
+    movements: 
+    [{
+        "actor": "A",
+        "target": {
+            "label": "reports",
+            "coordinate": [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121],
+            "additional_detail": ""
+        }
+    },
+    {
+        "actor": "B",
+        "target": {
+            "label": "storage room",
+            "coordinate": [-2.1866, 1.6935, 0.0162, 0.000, 0.000, 0.3310, 0.5311],
+            "additional_detail": ""
+        }
+    },
+    {
+        "actor": "A",
+        "target": {
+            "label": "storage room",
+            "coordinate": [-2.1866, 1.6935, 0.0162, 0.000, 0.000, 0.3310, 0.5311],
+            "additional_detail": ""
+        }
+    }]
+}
+"""
+    
     @staticmethod
     def build_prompt(past_dialogue, current_dialogue):
         prompt = f"""
