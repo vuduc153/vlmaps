@@ -46,11 +46,13 @@ class PromptTemplate:
 """
 
     SYSTEM_PROMPT = "You are an intelligent assistant which can infer likely follow-up locomotion actions from a transcript of a dialogue between two humans. \
-		You will be provided with both the complete transcript of the dialogue history up until the present to use as context, and the real-time transcript of the current live conversation. \
+		You will be provided with both the complete transcript of the dialogue history up until the present, and the real-time transcript of the current live conversation. \
         The dialogue history will be marked with <dialogue_history> token and the current conversation will be marked with <current_conversation> token. \
+        Use the dialogue history for context and use only the current conversation to detect intentions for follow-up actions. \
         You will also be provided with a textual description of the physical space of the two people, which will be marked with <scene_representation> token. \
         The locations of the speakers when the dialogues were spoken will also be provided for temporal context. Use the information to infer the most likely follow-up movements for the speakers. \
-        Only output valid JSON and nothing else. All coordinate values in the output must come from <scene_representation> or past locations."
+        Once again, it is very important to only infer follow-up actions from the current conversation, but not from the dialogue history. \
+        Answer only with valid JSON and nothing else. All coordinate values in the output must come from <scene_representation> or past locations."
 
     EXAMPLE_1 = f"""
 <scene_representation>
@@ -72,7 +74,7 @@ A: I'll be right back.
 """
 
     RESPONSE_1 = """
-From the dialogue, it can be inferred that A will go get the reports in the archives at [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121] after this; while B will stay at the current location [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211]. 
+From the current conversation, it can be inferred that A will go get the reports in the archives at [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121] after this; while B will stay at the current location [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211]. 
 After getting the report, A will bring them back to B. So the answer will be:
 {
     movements: 
@@ -124,8 +126,8 @@ A: Okay got it.
 """
 
     RESPONSE_2 = """
-From the dialogue, it can be inferred that A will go to the workstation at [-2.1466, 1.6935, 0.0362, 0.000, 0.000, 0.6610, 0.9211] to look at the data; while B will still stay at the current location [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211]. 
-After looking at the data, A will need to go report the findings back to B. So the answer will be:
+From the current conversation, it can be inferred that A will go to the workstation at [-2.1466, 1.6935, 0.0362, 0.000, 0.000, 0.6610, 0.9211] to look at the data; while B will still stay at the current location [-1.2066, 4.6135, 0.0062, 0.000, 0.000, 0.5610, 0.9211]. 
+After looking at the data, A will need to go report the findings back to B. From the past dialogue it can also be inferred that A would go to get the reports then return to B, but these actions are in the past, so they won't be included in the answer. So the answer will be:
 {
     movements:
     [{
@@ -196,8 +198,8 @@ B: I'll be waiting for you at the storage room.
 """
 
     RESPONSE_4 = """
-From the dialogue, it can be inferred that A will return to the report's location at [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121] again to check if there is a missing report, while B will be going to the storage room at [-2.1866, 1.6935, 0.0162, 0.000, 0.000, 0.3310, 0.5311].
-After double-checking for the missing report, A will go and find B at the new location. So the answer will be:
+From the current conversation, it can be inferred that A will return to the report's location at [1.3114, 0.7123, 0.2313, 0.000, 0.0010, 0.2141, 0.6121] again to check if there is a missing report, while B will be going to the storage room at [-2.1866, 1.6935, 0.0162, 0.000, 0.000, 0.3310, 0.5311].
+After double-checking for the missing report, A will go and find B at the new location. From the past dialogue it can also be inferred that A would go to get the reports, return to B, then go to the workstation, but these actions are in the past, so they won't be included in the answer. So the answer will be:
 {
     movements: 
     [{
