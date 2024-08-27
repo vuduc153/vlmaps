@@ -59,4 +59,4 @@ if __name__ == '__main__':
     logger.info("Server started")
     
     start = time.time()
-    web.run_app(init(), host='localhost', port=43001)
+    web.run_app(init(), host='0.0.0.0', port=43001)
