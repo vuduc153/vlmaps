@@ -375,6 +375,8 @@ def parse_object_goal_instruction_with_scene_graph(language_instr):
                 {"role": "assistant", "content": PromptTemplate.RESPONSE_3},
                 {"role": "user", "content": PromptTemplate.EXAMPLE_4},
                 {"role": "assistant", "content": PromptTemplate.RESPONSE_4},
+                {"role": "user", "content": PromptTemplate.EXAMPLE_5},
+                {"role": "assistant", "content": PromptTemplate.RESPONSE_5},
                 {"role": "user", "content": lang},
             ],
             # max_tokens=300,
