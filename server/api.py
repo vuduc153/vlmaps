@@ -12,12 +12,11 @@ from vlmaps.utils.prompt.template import PromptTemplate
 
 async def parse_speech(request):
 
-    logger.info(f"Received request {request}")
-
     try:
         json_msg = await request.json()
+        logger.info(json_msg['past'])
+        logger.info(json_msg['current'])
         message = PromptTemplate.build_prompt(json_msg['past'], json_msg['current'])
-        logger.info(message)
         result = parse_object_goal_instruction_with_scene_graph(message)
         
         if result is not None:
