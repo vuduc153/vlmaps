@@ -1,6 +1,6 @@
 from vlmaps.utils.prompt.scene_graph import SCENE_GRAPH
 
-class PromptTemplate:
+class DialoguePromptTemplate:
     
     EMPTY_TOKEN = "<empty>"
 
@@ -270,8 +270,25 @@ From the current conversation, it can be inferred that A will go look at the cam
 Space description:
 {SCENE_GRAPH}
 Dialogue history:
-{past_dialogue if past_dialogue else PromptTemplate.EMPTY_TOKEN}
+{past_dialogue if past_dialogue else DialoguePromptTemplate.EMPTY_TOKEN}
 Current conversation:
 {current_dialogue}
 """
         return prompt
+
+
+class DescriptionPromptTemplate:
+    
+    SYSTEM_PROMPT = f"Scene graph:\n{SCENE_GRAPH}\nIdentify the object in the scene graph above that most closely matches the description provided and return the object's coordinate. \
+        Answer only with valid JSON and nothing else. All coordinate must come from the scene graph."
+
+    EXAMPLE_1 = "a laptop next to a white robot"
+    RESPONSE_1 = '{"coordinate": [-0.3172, 0.9551, 0.0762, 0.0000, 0.0000, 0.2709, 0.9626]}'
+    EXAMPLE_2 = "a whiteboard in the hallway"
+    RESPONSE_2 = '{"coordinate": [0.1540, -2.3730, 0.0762, 0.0000, 0.0000, -0.7747, 0.6323]}'
+    EXAMPLE_3 = "a white box next to the kitchen counter"
+    RESPONSE_3 = '{"coordinate": [6.3634, -8.1088, 0.0762, 0.0000, 0.0000, -0.6936, 0.7204]}'
+    EXAMPLE_4 = "the television in the kitchen area"
+    RESPONSE_4 = '{"coordinate": [5.4294, -8.9272, 0.0762, 0.0000, 0.0000, 0.8602, 0.5099]}'
+    EXAMPLE_5 = "a couch"
+    RESPONSE_5 = '{"coordinate": [4.2509, -8.8848, 0.0762, 0.0000, 0.0000, -0.4497, 0.8932]}'

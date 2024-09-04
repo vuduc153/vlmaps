@@ -1,6 +1,6 @@
 import os
 import openai
-from vlmaps.utils.prompt.template import PromptTemplate
+from vlmaps.utils.prompt.template import DialoguePromptTemplate, DescriptionPromptTemplate
 
 
 def parse_object_goal_instruction_deprecated(language_instr):
@@ -358,33 +358,59 @@ def parse_object_goal_instruction_with_scene_graph(language_instr):
 
     openai_key = os.environ["OPENAI_KEY"]
     openai.api_key = openai_key
-    instructions_list = [language_instr]
-    results = ""
+    
+    client = openai.OpenAI(api_key=openai_key)
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": DialoguePromptTemplate.SYSTEM_PROMPT},
+            {"role": "user", "content": DialoguePromptTemplate.EXAMPLE_1},
+            {"role": "assistant", "content": DialoguePromptTemplate.RESPONSE_1},
+            {"role": "user", "content": DialoguePromptTemplate.EXAMPLE_2},
+            {"role": "assistant", "content": DialoguePromptTemplate.RESPONSE_2},
+            {"role": "user", "content": DialoguePromptTemplate.EXAMPLE_3},
+            {"role": "assistant", "content": DialoguePromptTemplate.RESPONSE_3},
+            {"role": "user", "content": DialoguePromptTemplate.EXAMPLE_4},
+            {"role": "assistant", "content": DialoguePromptTemplate.RESPONSE_4},
+            {"role": "user", "content": DialoguePromptTemplate.EXAMPLE_5},
+            {"role": "assistant", "content": DialoguePromptTemplate.RESPONSE_5},
+            {"role": "user", "content": language_instr},
+        ],
+        # max_tokens=300,
+        response_format={ "type": "json_object" }
+    )
+    text = response.choices[0].message.content
 
-    for lang in instructions_list:
-        client = openai.OpenAI(api_key=openai_key)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": PromptTemplate.SYSTEM_PROMPT},
-                {"role": "user", "content": PromptTemplate.EXAMPLE_1},
-                {"role": "assistant", "content": PromptTemplate.RESPONSE_1},
-                {"role": "user", "content": PromptTemplate.EXAMPLE_2},
-                {"role": "assistant", "content": PromptTemplate.RESPONSE_2},
-                {"role": "user", "content": PromptTemplate.EXAMPLE_3},
-                {"role": "assistant", "content": PromptTemplate.RESPONSE_3},
-                {"role": "user", "content": PromptTemplate.EXAMPLE_4},
-                {"role": "assistant", "content": PromptTemplate.RESPONSE_4},
-                {"role": "user", "content": PromptTemplate.EXAMPLE_5},
-                {"role": "assistant", "content": PromptTemplate.RESPONSE_5},
-                {"role": "user", "content": lang},
-            ],
-            # max_tokens=300,
-            response_format={ "type": "json_object" }
-        )
-        text = response.choices[0].message.content
-        if text:
-            results += text + "\n"
+    return text
+
+
+def parse_object_goal_description(language_instr):
+    import openai
+
+    openai_key = os.environ["OPENAI_KEY"]
+    openai.api_key = openai_key
+    client = openai.OpenAI(api_key=openai_key)
+    
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": DescriptionPromptTemplate.SYSTEM_PROMPT},
+            {"role": "user", "content": DescriptionPromptTemplate.EXAMPLE_1},
+            {"role": "assistant", "content": DescriptionPromptTemplate.RESPONSE_1},
+            {"role": "user", "content": DescriptionPromptTemplate.EXAMPLE_2},
+            {"role": "assistant", "content": DescriptionPromptTemplate.RESPONSE_2},
+            {"role": "user", "content": DescriptionPromptTemplate.EXAMPLE_3},
+            {"role": "assistant", "content": DescriptionPromptTemplate.RESPONSE_3},
+            {"role": "user", "content": DescriptionPromptTemplate.EXAMPLE_4},
+            {"role": "assistant", "content": DescriptionPromptTemplate.RESPONSE_4},
+            {"role": "user", "content": DescriptionPromptTemplate.EXAMPLE_5},
+            {"role": "assistant", "content": DescriptionPromptTemplate.RESPONSE_5},
+            {"role": "user", "content": language_instr},
+        ],
+        max_tokens=300
+    )
+
+    text = response.choices[0].message.content
     return text
 
 

@@ -6,15 +6,15 @@ import logging
 import time
 import json
 
-from vlmaps.utils.llm_utils import parse_object_goal_instruction_with_scene_graph
-from vlmaps.utils.prompt.template import PromptTemplate
+from vlmaps.utils.llm_utils import parse_object_goal_instruction_with_scene_graph, parse_object_goal_description
+from vlmaps.utils.prompt.template import DialoguePromptTemplate
 
 
-async def parse_speech(request):
+async def parse_dialogue(request):
 
     try:
         json_msg = await request.json()
-        message = PromptTemplate.build_prompt(json_msg['past'], json_msg['current'])
+        message = DialoguePromptTemplate.build_prompt(json_msg['past'], json_msg['current'])
         logger.info("Prompt: \n" + message)
         result = parse_object_goal_instruction_with_scene_graph(message)
         logger.info("Result: \n" + result)
@@ -23,6 +23,31 @@ async def parse_speech(request):
             return web.json_response(json.loads(result))
         else:
             return web.json_response({"movements": []})
+    
+    except json.decoder.JSONDecodeError:
+        logger.error("Invalid JSON payload from client")
+        return web.Response(text="Invalid JSON payload", status=400)
+    except KeyError as e:
+        logger.error(f"KeyError: {str(e)}")
+        return web.Response(text="Missing required fields in JSON", status=400)
+    except Exception as e:
+        logger.error(f"Error processing request: {str(e)}")
+        return web.Response(text="Internal Server Error", status=500)
+
+
+async def parse_description(request):
+
+    try:
+        json_msg = await request.json()
+        message = json_msg['desc']
+        logger.info("Description: \n" + message)
+        result = parse_object_goal_description(message)
+        logger.info("Result: \n" + result)
+        
+        if result is not None:
+            return web.json_response(json.loads(result))
+        else:
+            return web.json_response({"coordinate": []})
     
     except json.decoder.JSONDecodeError:
         logger.error("Invalid JSON payload from client")
@@ -47,7 +72,8 @@ async def init():
     app = web.Application(
         middlewares=[cors_middleware(allow_all=True)]
     )
-    app.router.add_post('/parse', parse_speech)
+    app.router.add_post('/parse', parse_dialogue)
+    app.router.add_post('/parse_desc', parse_description)
     return app
 
 
