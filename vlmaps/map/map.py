@@ -77,7 +77,7 @@ class Map:
     def index_map(self, language_desc: str, with_init_cat: bool = True):
         return NotImplementedError
 
-    def generate_obstacle_map(self, h_min: float = 1.5, h_max: float = 2.0) -> np.ndarray:
+    def generate_obstacle_map(self, h_min: float = 0.2, h_max: float = 1.3) -> np.ndarray:
         """Generate topdown obstacle map from loaded 3D map
 
         Args:
@@ -204,15 +204,15 @@ class Map:
         nearest_coords = [int(nearest.x), int(nearest.y)]
 
         # Move the goal by 10 units away from the object
-        vector = [coord[0] - nearest_coords[0], coord[1] - nearest_coords[1]]
-        length_vector = math.sqrt(vector[0]**2 + vector[1]**2)
+        # vector = [coord[0] - nearest_coords[0], coord[1] - nearest_coords[1]]
+        # length_vector = math.sqrt(vector[0]**2 + vector[1]**2)
 
-        if length_vector:
-            unit_vector = [vector[0] / length_vector, vector[1] / length_vector]
-        else:
-            unit_vector = [0, 0]
+        # if length_vector:
+        #     unit_vector = [vector[0] / length_vector, vector[1] / length_vector]
+        # else:
+        #     unit_vector = [0, 0]
 
-        return [nearest_coords[0] + unit_vector[0] * 10, nearest_coords[1] + unit_vector[1] * 10]
+        return nearest_coords
 
     def get_forward_pos(self, curr_pos: List[float], curr_angle_deg: float, meters: float) -> List[float]:
         i, j = curr_pos

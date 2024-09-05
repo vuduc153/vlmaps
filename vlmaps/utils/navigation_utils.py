@@ -235,7 +235,7 @@ def get_goal_coordinate(start, goal, obstacles, G: vg.VisGraph = None, vis=False
     if obstacles[int(goal[0]), int(goal[1])] == 0:
         print("goal in obstacles")
         try:
-            goalvg = G.closest_point(goalvg, poly_id, length=10)
+            goalvg = G.closest_point(goalvg, poly_id, length=1)
         except:
             goal_new = get_nearby_position(goal, G)
             goalvg = vg.Point(goal_new[0], goal_new[1])

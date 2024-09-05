@@ -35,8 +35,7 @@ mp3dcat = [
     "gym_equipment",
     "seating",
     "board_panel",
-    "furniture",
     "appliances",
     "clothes",
-    "objects",
+    "objects"
 ]

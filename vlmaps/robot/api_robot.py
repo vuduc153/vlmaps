@@ -1,5 +1,6 @@
 from vlmaps.robot.lang_robot import LangRobot
 from vlmaps.navigator.navigator import Navigator
+from vlmaps.map.map import Map
 from vlmaps.utils.matterport3d_categories import mp3dcat
 from omegaconf import DictConfig
 from typing import List, Tuple, Dict, Any, Union
@@ -25,6 +26,9 @@ class ApiRobot(LangRobot):
 
 	    cropped_obst_map = self.map.get_obstacle_cropped()
 
+	    # cropped_obst_map = Map._dilate_map(cropped_obst_map == 0, 3, 1)
+	    # cropped_obst_map = cropped_obst_map == 0
+
 	    self.nav.build_visgraph(
 	        cropped_obst_map,
 	        self.map.rmin,
@@ -47,7 +51,7 @@ class ApiRobot(LangRobot):
 		robot_pose = self.get_agent_pose_on_map()  # (row, col, angle_deg) on full map
 
 		goal = self.nav.go_to(
-			robot_pose[:2], pos, vis=False
+			robot_pose[:2], pos, vis=True
 		)  # take (row, col) in full map
 
 		self.goals.append(goal)
@@ -69,7 +73,7 @@ class ApiRobot(LangRobot):
 		coordinates = []
 
 		for goal in self.goals:
-			rotation = Rotation.from_euler('xyz', [0, 0, goal[2]])
+			rotation = Rotation.from_euler('z', goal[2], degrees=True)
 			quaternion = rotation.as_quat()
 			qx, qy, qz, qw = quaternion
 			coordinates.append([goal[0]*self.cs, goal[1]*self.cs, 0, qx, qy, qz, qw])
@@ -98,11 +102,10 @@ def main(config: DictConfig) -> None:
 	robot.map._init_clip()
 	robot.map.init_categories(mp3dcat[1:-1])
 	   
-	robot.set_curr_pose((284, 94, 0))
-	robot.move_to_object('mirror')
-
-	robot.move_to_object('tv_monitor')
-	robot.with_object_on_left('table')
+	robot.set_curr_pose((296, 132, 25))
+	robot.move_to_object('chair')
+	robot.move_to_object('counter')
+	robot.with_object_on_left('couch')
 
 	print(robot.get_formatted_goals())
 
