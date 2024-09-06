@@ -8,7 +8,7 @@ import hydra
 from pathlib import Path
 import cv2
 import numpy as np 
-from scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation as R
 from math import radians
 import json
 
@@ -18,6 +18,7 @@ class ApiRobot(LangRobot):
 	def __init__(self, config: DictConfig):
 		super().__init__(config)
 		self.cs = self.config["params"]["cs"]
+		self.names = []
 		self.goals = []
 		self.nav = Navigator()
 
@@ -26,8 +27,8 @@ class ApiRobot(LangRobot):
 
 	    cropped_obst_map = self.map.get_obstacle_cropped()
 
-	    # cropped_obst_map = Map._dilate_map(cropped_obst_map == 0, 3, 1)
-	    # cropped_obst_map = cropped_obst_map == 0
+	    cropped_obst_map = Map._dilate_map(cropped_obst_map == 0, 3, 1)
+	    cropped_obst_map = cropped_obst_map == 0
 
 	    self.nav.build_visgraph(
 	        cropped_obst_map,
@@ -70,21 +71,64 @@ class ApiRobot(LangRobot):
 		self.goals.append(robot_pose)
 
 	def get_formatted_goals(self):
-		coordinates = []
+		poses = []
 
 		for goal in self.goals:
-			rotation = Rotation.from_euler('z', goal[2], degrees=True)
-			quaternion = rotation.as_quat()
-			qx, qy, qz, qw = quaternion
-			coordinates.append([goal[0]*self.cs, goal[1]*self.cs, 0, qx, qy, qz, qw])
+			poses.append(self.transform_vlmaps_pose_to_ros_pose(goal))
 
-		data = {
-			'movements': [
-				{"actor": "A", "target": {"label": "", "coordinate": coordinate, "additional_detail": ""}} for coordinate in coordinates
-			]
-		}
+		data = {'movements': [{"actor": "A", "target": {"label": name, "coordinate": pose, "additional_detail": ""}} for (pose, name) in zip(poses, self.names)]}
 
-		return json.dumps(data)
+		self.goals = []
+		self.names = []
+
+		return data
+
+	# Override
+	def move_to_left(self, name: str):
+		self.names.append(name)
+		super().move_to_left(name)
+
+	def move_to_right(self, name: str):
+		self.names.append(name)
+		super().move_to_right(name)
+
+	def move_north(self, name: str):
+		self.names.append(name)
+		super().move_north(name)
+
+	def move_south(self, name: str):
+		self.names.append(name)
+		super().move_south(name)
+
+	def move_west(self, name: str):
+		self.names.append(name)
+		super().move_west(name)
+
+	def move_east(self, name: str):
+		self.names.append(name)
+		super().move_east(name)
+
+	def move_to_object(self, name: str):
+		self.names.append(name)
+		super().move_to_object(name)
+
+	def move_forward(self, meters: float):
+		self.names.append(name)
+		super().move_forward(name)
+
+	# TODO: get transformation programmatically
+	def transform_ros_pose_to_vlmaps_pose(self, ros_pose):
+		x, y, z, qx, qy, qz, qw = ros_pose
+		r = R.from_quat([qx, qy, qz, qw])
+		_, _, yaw = r.as_euler('xyz', degrees=True)
+		return [(x + 3.194) / self.cs, (y + 3.943) / self.cs, yaw]
+
+	def transform_vlmaps_pose_to_ros_pose(self, vlmaps_pose):
+	    x, y, yaw = vlmaps_pose
+	    rotation = R.from_euler('z', yaw, degrees=True)
+	    quaternion = rotation.as_quat()
+	    qx, qy, qz, qw = quaternion
+	    return [x * self.cs - 3.194, y * self.cs - 3.943, 0, qx, qy, qz, qw]
 
 
 @hydra.main(
@@ -102,10 +146,11 @@ def main(config: DictConfig) -> None:
 	robot.map._init_clip()
 	robot.map.init_categories(mp3dcat[1:-1])
 	   
-	robot.set_curr_pose((296, 132, 25))
-	robot.move_to_object('chair')
-	robot.move_to_object('counter')
-	robot.with_object_on_left('couch')
+	robot.set_curr_pose((276.3, 79.96, 25))
+	# robot.move_to_object('chair')
+	robot.move_to_object('white_chair_next_to_the_couch')
+	robot.move_to_object('kitchen_counter')
+	# robot.with_object_on_left('couch')
 
 	print(robot.get_formatted_goals())
 

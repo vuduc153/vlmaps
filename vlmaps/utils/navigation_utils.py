@@ -143,7 +143,7 @@ def build_visgraph_with_obs_map(obs_map, use_internal_contour=False, internal_po
 
 
 def get_nearby_position(goal: Tuple[float, float], G: vg.VisGraph) -> Tuple[float, float]:
-    for dr, dc in zip([-10, 10, -10, 10], [-10, -10, 10, 10]):
+    for dr, dc in zip([-15, 15, -15, 15], [-15, -15, 15, 15]):
         goalvg_new = vg.Point(goal[0] + dr, goal[1] + dc)
         poly_id_new = G.point_in_polygon(goalvg_new)
         if poly_id_new == -1:
@@ -234,11 +234,14 @@ def get_goal_coordinate(start, goal, obstacles, G: vg.VisGraph = None, vis=False
 
     if obstacles[int(goal[0]), int(goal[1])] == 0:
         print("goal in obstacles")
-        try:
-            goalvg = G.closest_point(goalvg, poly_id, length=1)
-        except:
-            goal_new = get_nearby_position(goal, G)
-            goalvg = vg.Point(goal_new[0], goal_new[1])
+        # try:
+        #     goalvg = G.closest_point(goalvg, poly_id, length=1)
+        # except:
+        #     goal_new = get_nearby_position(goal, G)
+        #     goalvg = vg.Point(goal_new[0], goal_new[1])
+
+        goal_new = get_nearby_position(goal, G)
+        goalvg = vg.Point(goal_new[0], goal_new[1])
 
         print("goalvg: ", goalvg)
 

@@ -43,6 +43,7 @@ def find_similar_category_id(class_name, classes_list):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
+            {"role": "system", "content": "Answer the question only with the object name and nothing else."},
             {
                 "role": "user",
                 "content": "What is television most relevant to among tv_monitor,plant,chair",
