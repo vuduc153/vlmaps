@@ -77,7 +77,7 @@ class Map:
     def index_map(self, language_desc: str, with_init_cat: bool = True):
         return NotImplementedError
 
-    def generate_obstacle_map(self, h_min: float = 0.2, h_max: float = 1.3) -> np.ndarray:
+    def generate_obstacle_map(self, h_min: float = 1.3, h_max: float = 2.0) -> np.ndarray:
         """Generate topdown obstacle map from loaded 3D map
 
         Args:

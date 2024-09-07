@@ -121,14 +121,14 @@ class ApiRobot(LangRobot):
 		x, y, z, qx, qy, qz, qw = ros_pose
 		r = R.from_quat([qx, qy, qz, qw])
 		_, _, yaw = r.as_euler('xyz', degrees=True)
-		return [(x + 3.194) / self.cs, (y + 3.943) / self.cs, yaw]
+		return [(x + 1.865) / self.cs, (y + 2.837) / self.cs, yaw]
 
 	def transform_vlmaps_pose_to_ros_pose(self, vlmaps_pose):
 	    x, y, yaw = vlmaps_pose
 	    rotation = R.from_euler('z', yaw, degrees=True)
 	    quaternion = rotation.as_quat()
 	    qx, qy, qz, qw = quaternion
-	    return [x * self.cs - 3.194, y * self.cs - 3.943, 0, qx, qy, qz, qw]
+	    return [x * self.cs - 1.865, y * self.cs - 2.837, 0, qx, qy, qz, qw]
 
 
 @hydra.main(
@@ -145,11 +145,11 @@ def main(config: DictConfig) -> None:
 
 	robot.map._init_clip()
 	robot.map.init_categories(mp3dcat[1:-1])
-	   
-	robot.set_curr_pose((276.3, 79.96, 25))
-	# robot.move_to_object('chair')
-	robot.move_to_object('white_chair_next_to_the_couch')
-	robot.move_to_object('kitchen_counter')
+
+	robot.set_curr_pose((294.254, 123.128, 25))
+	# robot.move_to_object('desk')
+	robot.move_to_object('mirror')
+	# robot.move_to_object('couch')
 	# robot.with_object_on_left('couch')
 
 	print(robot.get_formatted_goals())
