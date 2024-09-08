@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import cv2
 from scipy.spatial.distance import cdist
@@ -149,6 +150,37 @@ def get_nearby_position(goal: Tuple[float, float], G: vg.VisGraph) -> Tuple[floa
         if poly_id_new == -1:
             return (goal[0] + dr, goal[1] + dc)
 
+def get_nearby_position_on_vector(start: Tuple[float, float], goal: Tuple[float, float], obstacles) -> Tuple[float, float]:
+    
+    vector = [start[0] - goal[0], start[1] - goal[1]]
+    length_vector = math.sqrt(vector[0]**2 + vector[1]**2)
+
+    if length_vector:
+        unit_vector = [vector[0] / length_vector, vector[1] / length_vector]
+    else: # start and goal overlap
+        unit_vector = [0, 0]
+
+    step_size = 10
+    margin = step_size // 2
+    goal_new =  [goal[0] + unit_vector[0] * step_size, goal[1] + unit_vector[1] * step_size]
+    
+    # new goal in obstacles
+    while close_to_obstacles((int(goal_new[0]), int(goal_new[1])), margin, obstacles):
+        
+        print(goal_new)
+        goal_new = [goal_new[0] + unit_vector[0] * step_size, goal_new[1] + unit_vector[1] * step_size]
+
+        # TODO: rework this on edge cases
+        # if goal exceeds start position on vector aka moving backwards, stay in place
+        # if (goal_new[0] - start[0]) * vector[0] >= 0 and (goal_new[1] - start[1]) * vector[1] >= 0:
+        #     return start
+
+    return goal_new
+
+def close_to_obstacles(pos: Tuple[float, float], margin: int, obstacles) -> bool:
+    i_start, i_end = max(0, pos[0] - margin), min(obstacles.shape[0], pos[0] + margin)
+    j_start, j_end = max(0, pos[1] - margin), min(obstacles.shape[1], pos[1] + margin)
+    return np.any(obstacles[i_start:i_end, j_start:j_end] == 0)
 
 def plan_to_pos_v2(start, goal, obstacles, G: vg.VisGraph = None, vis=False):
     """
@@ -240,7 +272,7 @@ def get_goal_coordinate(start, goal, obstacles, G: vg.VisGraph = None, vis=False
         #     goal_new = get_nearby_position(goal, G)
         #     goalvg = vg.Point(goal_new[0], goal_new[1])
 
-        goal_new = get_nearby_position(goal, G)
+        goal_new = get_nearby_position_on_vector(start, goal, obstacles)
         goalvg = vg.Point(goal_new[0], goal_new[1])
 
         print("goalvg: ", goalvg)

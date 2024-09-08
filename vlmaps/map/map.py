@@ -438,6 +438,8 @@ class Map:
 
     def get_delta_angle_to(self, curr_pos: List[float], curr_angle_deg: float, name: str):
         contours, centers, bbox_list = self.get_pos(name)
+        if len(centers) == 0:
+            return 0
         nearest_id = self.select_nearest_obj(centers, bbox_list, curr_pos)
         nearest_center = centers[nearest_id]
         dx = nearest_center[0] - curr_pos[0]  # down

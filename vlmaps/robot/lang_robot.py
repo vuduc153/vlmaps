@@ -147,8 +147,9 @@ class LangRobot:
     def turn_absolute(self, angle_deg: float):
         self._set_nav_curr_pose()
         delta_deg = angle_deg - self.curr_ang_deg_on_map
-        actions_list = self.turn(delta_deg)
-        self.recorded_actions_list.extend(actions_list)
+        # actions_list = self.turn(delta_deg)
+        # self.recorded_actions_list.extend(actions_list)
+        self.turn(delta_deg)
 
     def face(self, name: str):
         self._set_nav_curr_pose()

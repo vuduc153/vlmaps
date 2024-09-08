@@ -55,10 +55,20 @@ class ApiRobot(LangRobot):
 			robot_pose[:2], pos, vis=True
 		)  # take (row, col) in full map
 
-		self.goals.append(goal)
+		if goal[0] != self.curr_pos_on_map[0] or goal[1] != self.curr_pos_on_map[1]:
+			self.goals.append(goal)
+		else:
+			print("stay in place")
+			self.names.pop()
+		
 		self.set_curr_pose(goal)
 
 	def turn(self, angle_deg: float):
+		if angle_deg == 0:
+			print("stay in place")
+			self.names.pop()
+			return
+
 		self.curr_ang_deg_on_map += angle_deg
 
 		if self.curr_ang_deg_on_map < 0:
@@ -84,6 +94,14 @@ class ApiRobot(LangRobot):
 		return data
 
 	# Override
+	def with_object_on_left(self, name: str):
+		self.names.append(name)
+		super().with_object_on_left(name)
+
+	def with_object_on_right(self, name: str):
+		self.names.append(name)
+		super().with_object_on_right(name)
+
 	def move_to_left(self, name: str):
 		self.names.append(name)
 		super().move_to_left(name)
@@ -113,8 +131,16 @@ class ApiRobot(LangRobot):
 		super().move_to_object(name)
 
 	def move_forward(self, meters: float):
+		self.names.append(f"move {meters} meters")
+		super().move_forward(meters)
+
+	def turn_absolute(self, angle_deg: float):
+		self.names.append(f"turn to {angle_deg} degree")
+		super().turn_absolute(angle_deg)
+
+	def face(self, name: str):
 		self.names.append(name)
-		super().move_forward(name)
+		super().face(name)
 
 	# TODO: get transformation programmatically
 	def transform_ros_pose_to_vlmaps_pose(self, ros_pose):
@@ -147,10 +173,14 @@ def main(config: DictConfig) -> None:
 	robot.map.init_categories(mp3dcat[1:-1])
 
 	robot.set_curr_pose((294.254, 123.128, 25))
-	# robot.move_to_object('desk')
+	robot.move_to_object('black_desk')
 	robot.move_to_object('mirror')
-	# robot.move_to_object('couch')
-	# robot.with_object_on_left('couch')
+	robot.move_to_object('couch')
+	# robot.move_south('mirror')
+	robot.with_object_on_left('mirror')
+	robot.move_forward(3)
+	robot.turn_absolute(90)
+	robot.face('desk')
 
 	print(robot.get_formatted_goals())
 

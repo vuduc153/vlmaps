@@ -33,6 +33,7 @@ def find_similar_category_id_deprecate(class_name, classes_list):
 
 def find_similar_category_id(class_name, classes_list):
     if class_name in classes_list:
+        print(f"found class_name {class_name} in init_cat")
         return classes_list.index(class_name)
     import openai
 
