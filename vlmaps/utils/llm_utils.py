@@ -407,7 +407,8 @@ def parse_object_goal_description(language_instr):
             {"role": "assistant", "content": DescriptionPromptTemplate.RESPONSE_5},
             {"role": "user", "content": language_instr},
         ],
-        max_tokens=300
+        max_tokens=300,
+        response_format={ "type": "json_object" }
     )
 
     text = response.choices[0].message.content
