@@ -19,7 +19,7 @@ async def parse_dialogue(request):
         result = parse_object_goal_instruction_with_scene_graph(message)
         logger.info("Result: \n" + result)
         
-        if result is not None:
+        if result:
             return web.json_response(json.loads(result))
         else:
             return web.json_response({"movements": []})
@@ -44,7 +44,7 @@ async def parse_description(request):
         result = parse_object_goal_description(message)
         logger.info("Result: \n" + result)
         
-        if result is not None:
+        if result:
             return web.json_response(json.loads(result))
         else:
             return web.json_response({"coordinate": []})
