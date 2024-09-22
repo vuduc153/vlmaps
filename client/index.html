@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Class Selector</title>
+</head>
+<body>
+    <h1>Select Object Classes</h1>
+
+    <!-- Input field for WebSocket server IP -->
+    <label for="ipApi">WebSocket Server IP:</label>
+    <input type="text" id="ipApi" placeholder="Enter WebSocket Server IP" />
+
+    <br><br>
+
+    <h2>Select Objects:</h2>
+    <div id="object-classes">
+        <!-- Checkboxes for object classes will be generated dynamically here -->
+    </div>
+    <br><br>
+
+    <h2>Selected Objects</h2>
+    <ul id="selected-objects-list">
+    </ul>
+    <br><br>
+
+    <button id="send-button">Send Selected Classes</button>
+
+    <script>
+        const SCENE_GRAPH = {
+            "function": "office building",
+            "additional_detail": "Melbourne Connect",
+            "rooms": [
+                {
+                    "scene_category": "UX lab",
+                    "additional_detail": "user experience laboratory",
+                    "objects": [
+                        {"class_": "mirror", "coordinate": [0.2103, 0.2772, 0.0762, 0.0000, 0.0000, -0.4675, 0.8840], "additional_detail": ""},
+                        {"class_": "white robot", "coordinate": [-0.0935, -0.2019, 0.0762, 0.0000, 0.0000, 0.2360, 0.9717], "additional_detail": ""},
+                        {"class_": "laptop next to a white robot", "coordinate": [-0.3172, 0.9551, 0.0762, 0.0000, 0.0000, 0.2709, 0.9626], "additional_detail": ""},
+                        {"class_": "white board", "coordinate": [0.1540, -2.3730, 0.0762, 0.0000, 0.0000, -0.7747, 0.6323], "additional_detail": ""},
+                        {"class_": "couch", "coordinate": [4.2509, -8.8848, 0.0762, 0.0000, 0.0000, -0.4497, 0.8932], "additional_detail": ""},
+                        {"class_": "kitchen counter", "coordinate": [6.7484, -8.0333, 0.0762, 0.0000, 0.0000, -0.3477, 0.9376], "additional_detail": ""},
+                        {"class_": "desk next to a white robot", "coordinate": [-0.2819, 0.8064, 0.0762, 0.0000, 0.0000, 0.2750, 0.9615], "additional_detail": ""},
+                        {"class_": "desk", "coordinate": [-0.8504, 0.9253, 0.0762, 0.0000, 0.0000, 0.7741, 0.6331], "additional_detail": ""},
+                        {"class_": "carton box", "coordinate": [-1.2037, 0.8732, 0.0762, 0.0000, 0.0000, 0.8454, 0.5341], "additional_detail": ""},
+                        {"class_": "coffee machine", "coordinate": [6.7484, -8.0333, 0.0762, 0.0000, 0.0000, -0.3477, 0.9376], "additional_detail": ""},
+                        {"class_": "white box", "coordinate": [6.3634, -8.1088, 0.0762, 0.0000, 0.0000, -0.6936, 0.7204], "additional_detail": ""},
+                        {"class_": "black box", "coordinate": [6.7373, -8.0245, 0.0762, 0.0000, 0.0000, 0.1209, 0.9927], "additional_detail": ""},
+                        {"class_": "chair", "coordinate": [-0.3172, 0.9551, 0.0762, 0.0000, 0.0000, 0.2709, 0.9626], "additional_detail": ""},
+                        {"class_": "chair in the kitchen", "coordinate": [6.3634, -8.1088, 0.0762, 0.0000, 0.0000, -0.6936, 0.7204], "additional_detail": ""},
+                        {"class_": "television", "coordinate": [5.4294, -8.9272, 0.0762, 0.0000, 0.0000, 0.8602, 0.5099], "additional_detail": ""}
+                    ]
+                }
+            ]
+        };
+
+        let selectedObjects = [];
+
+        function populateObjectClasses() {
+            const container = document.getElementById('object-classes');
+            const objects = SCENE_GRAPH.rooms[0].objects;
+
+            objects.forEach((obj, index) => {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = index;
+                checkbox.id = `object-${index}`;
+
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectedObjects.push(index);  // Add to selection
+                    } else {
+                        selectedObjects = selectedObjects.filter(i => i !== index);  // Remove from selection
+                    }
+                    updateSelectedObjectsList();  // Update the displayed list
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = `object-${index}`;
+                label.textContent = obj.class_;
+
+                const div = document.createElement('div');
+                div.appendChild(checkbox);
+                div.appendChild(label);
+
+                container.appendChild(div);
+            });
+        }
+
+        function updateSelectedObjectsList() {
+            const ulElement = document.getElementById('selected-objects-list');
+            ulElement.innerHTML = "";  // Clear the list
+
+            selectedObjects.forEach(index => {
+                const obj = SCENE_GRAPH.rooms[0].objects[index];
+                const li = document.createElement('li');
+                li.textContent = obj.class_;
+                ulElement.appendChild(li);
+            });
+        }
+
+        function sendSelectedClasses() {
+            if (selectedObjects.length === 0) {
+                alert("Please select at least one object.");
+                return;
+            }
+
+            const movements = selectedObjects.map(index => {
+                const obj = SCENE_GRAPH.rooms[0].objects[index];
+                return {
+                    actor: "A",
+                    target: {
+                        label: obj.class_,
+                        coordinate: obj.coordinate,
+                        additional_detail: obj.additional_detail
+                    }
+                };
+            });
+
+            const message = { movements: movements };
+
+            const ipAddress = document.getElementById('ipApi').value;
+            if (!ipAddress) {
+                alert("Please enter the WebSocket server IP address.");
+                return;
+            }
+
+            const socket = new WebSocket(`ws://${ipAddress}:43000`);
+
+            socket.onopen = () => {
+                console.log('WebSocket connection opened');
+                socket.send(JSON.stringify(message));
+                console.log('Sent:', message);
+                resetSelectedObjects();
+                socket.close();
+            };
+
+            socket.onmessage = (event) => {
+                console.log('Message from server:', event.data);
+            };
+
+            socket.onclose = () => {
+                console.log('WebSocket connection closed');
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        }
+
+        function resetSelectedObjects() {
+            const checkboxes = document.querySelectorAll('#object-classes input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            selectedObjects = [];
+            updateSelectedObjectsList();
+        }
+
+        document.getElementById('send-button').addEventListener('click', sendSelectedClasses);
+        window.onload = populateObjectClasses;
+    </script>
+</body>
+</html>
