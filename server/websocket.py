@@ -1,5 +1,6 @@
 import asyncio
 import websockets
+import logging
 
 # Store connected clients
 client_a = None
@@ -38,7 +39,11 @@ async def handler(websocket, path):
             client_b = None
 
 async def main():
-    async with websockets.serve(handler, "localhost", 43000):
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger(__name__)
+    logger.info("Server started")
+    
+    async with websockets.serve(handler, "0.0.0.0", 43000):
         await asyncio.Future()
 
 asyncio.run(main())
