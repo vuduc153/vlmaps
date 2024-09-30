@@ -25,7 +25,7 @@ SCENE_GRAPH = """
                     "additional_detail": ""
                 },
                 {
-                    "class_": "couch",
+                    "class_": "couch in the kitchen",
                     "coordinate": [12.0661, 2.8540, 0.0762, 0.0000, 0.0000, -0.4155, 0.9096],
                     "additional_detail": ""
                 },
