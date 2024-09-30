@@ -291,4 +291,4 @@ class DescriptionPromptTemplate:
     EXAMPLE_4 = "the television in the kitchen area"
     RESPONSE_4 = '{"coordinate": [12.1616, 4.1286, 0.0762, 0.0000, 0.0000, 0.9212, -0.3892]}'
     EXAMPLE_5 = "a couch"
-    RESPONSE_5 = '{"coordinate": [10.8792, 0.4763, 0.0762, 0.0000, 0.0000, 0.2865, 0.9581]}'
+    RESPONSE_5 = '{"coordinate": [12.0661, 2.8540, 0.0762, 0.0000, 0.0000, -0.4155, 0.9096]}'
