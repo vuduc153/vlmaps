@@ -287,7 +287,7 @@ class DescriptionPromptTemplate:
     EXAMPLE_2 = "a whiteboard in the hallway"
     RESPONSE_2 = '{"coordinate": [7.2407, 0.2092, 0.0762, 0.0000, 0.0000, 0.9259, -0.3778]}'
     EXAMPLE_3 = "a white box in the room corner"
-    RESPONSE_3 = '{"coordinate": [9.1733, 8.2432, 0.0762, 0.0000, 0.0000, 0.5495, 0.8355]}'
+    RESPONSE_3 = '{"coordinate": [9.1845, 7.9627, 0.0762, 0.0000, 0.0000, 0.6186, 0.7857]}'
     EXAMPLE_4 = "the television in the kitchen area"
     RESPONSE_4 = '{"coordinate": [12.1616, 4.1286, 0.0762, 0.0000, 0.0000, 0.9212, -0.3892]}'
     EXAMPLE_5 = "a couch"
