@@ -283,12 +283,12 @@ class DescriptionPromptTemplate:
         Answer only with valid JSON and nothing else. All coordinate must come from the scene graph."
 
     EXAMPLE_1 = "a laptop next to a white robot"
-    RESPONSE_1 = '{"coordinate": [-0.3172, 0.9551, 0.0762, 0.0000, 0.0000, 0.2709, 0.9626]}'
+    RESPONSE_1 = '{"coordinate": [1.2456, 1.3420, 0.0762, 0.0000, 0.0000, 0.7595, 0.6505]}'
     EXAMPLE_2 = "a whiteboard in the hallway"
-    RESPONSE_2 = '{"coordinate": [0.1540, -2.3730, 0.0762, 0.0000, 0.0000, -0.7747, 0.6323]}'
-    EXAMPLE_3 = "a white box next to the kitchen counter"
-    RESPONSE_3 = '{"coordinate": [6.3634, -8.1088, 0.0762, 0.0000, 0.0000, -0.6936, 0.7204]}'
+    RESPONSE_2 = '{"coordinate": [7.2407, 0.2092, 0.0762, 0.0000, 0.0000, 0.9259, -0.3778]}'
+    EXAMPLE_3 = "a white box in the room corner"
+    RESPONSE_3 = '{"coordinate": [9.1733, 8.2432, 0.0762, 0.0000, 0.0000, 0.5495, 0.8355]}'
     EXAMPLE_4 = "the television in the kitchen area"
-    RESPONSE_4 = '{"coordinate": [5.4294, -8.9272, 0.0762, 0.0000, 0.0000, 0.8602, 0.5099]}'
+    RESPONSE_4 = '{"coordinate": [12.1616, 4.1286, 0.0762, 0.0000, 0.0000, 0.9212, -0.3892]}'
     EXAMPLE_5 = "a couch"
-    RESPONSE_5 = '{"coordinate": [4.2509, -8.8848, 0.0762, 0.0000, 0.0000, -0.4497, 0.8932]}'
+    RESPONSE_5 = '{"coordinate": [10.8792, 0.4763, 0.0762, 0.0000, 0.0000, 0.2865, 0.9581]}'
