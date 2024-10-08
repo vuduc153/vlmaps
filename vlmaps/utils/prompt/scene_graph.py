@@ -31,7 +31,7 @@ SCENE_GRAPH = """
                 },
                 {
                     "class_": "kitchen counter",
-                    "coordinate": [9.8329, 2.3461, 0.0762, 0.0000, 0.0000, 0.3061, 0.9520],
+                    "coordinate": [9.8715, 2.2885, 0.0762, 0.0000, 0.0000, 0.4394, 0.8983],
                     "additional_detail": ""
                 },
                 {
