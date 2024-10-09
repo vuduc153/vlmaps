@@ -9,7 +9,7 @@ SCENE_GRAPH = """
             "objects": [
                 {
                     "class_": "mirror",
-                    "coordinate": [6.6525, 6.9745, 0.0762, 0.0000, 0.0000, 0.9984, 0.0568],
+                    "coordinate": [6.2708, 7.1017, 0.0762, 0.0000, 0.0000, 0.9600, 0.2800],
                     "additional_detail": ""
                 }, {
                     "class_": "white robot",
