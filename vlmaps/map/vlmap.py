@@ -143,10 +143,22 @@ class VLMap(Map):
         )  # score for name and other
         return self.scores_mat
 
-    def index_map(self, language_desc: str, with_init_cat: bool = True):
+    def index_map(self, language_desc: str, with_init_cat: bool = True, use_init_cat_as_other = False):
         if with_init_cat and self.scores_mat is not None and self.categories is not None:
-            cat_id = find_similar_category_id(language_desc, self.categories)
-            scores_mat = self.scores_mat
+            if use_init_cat_as_other and language_desc not in self.categories:
+                print(f'indexing {language_desc} against {[language_desc] + self.categories}')
+                scores_mat = get_lseg_score(
+                    self.clip_model,
+                    [language_desc] + self.categories,
+                    self.grid_feat,
+                    self.clip_feat_dim,
+                    use_multiple_templates=True,
+                    add_other=False,
+                )
+                cat_id = 0
+            else:
+                cat_id = find_similar_category_id(language_desc, self.categories)
+                scores_mat = self.scores_mat
         else:
             if with_init_cat:
                 raise Exception(
@@ -255,7 +267,7 @@ class VLMap(Map):
         # labeled_map_cropped = np.argmax(labeled_map_cropped, axis=1)  # (N,)
         # pc_mask = labeled_map_cropped == cat_id # (N,)
         # self.grid_pos[pc_mask]
-        pc_mask = self.index_map(name, with_init_cat=True)
+        pc_mask = self.index_map(name, with_init_cat=True, use_init_cat_as_other=True)
         mask_2d = pool_3d_label_to_2d(pc_mask, self.grid_pos, self.gs)
         mask_2d = mask_2d[self.rmin : self.rmax + 1, self.cmin : self.cmax + 1]
         # print(f"showing mask for object cat {name}")

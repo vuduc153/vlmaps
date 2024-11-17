@@ -1,6 +1,6 @@
 import numpy as np
 import pyvisgraph as vg
-from vlmaps.utils.navigation_utils import build_visgraph_with_obs_map, plan_to_pos_v2
+from vlmaps.utils.navigation_utils import build_visgraph_with_obs_map, plan_to_pos_v2, get_goal_coordinate
 from typing import Tuple, List, Dict
 
 
@@ -29,11 +29,24 @@ class Navigator:
         paths = self.shift_path(paths, self.rowmin, self.colmin)
         return paths
 
+    def go_to(self, start_full_map: Tuple[float, float], goal_full_map: Tuple[float, float], vis: bool = False) -> Tuple[float]:
+        """
+        Take full map start (row, col) and full map goal (row, col) as input
+        Return the nearest empty position to the goal -- planning is done at ROS layer
+        """
+        start = self._convert_full_map_pos_to_cropped_map_pos(start_full_map)
+        goal = self._convert_full_map_pos_to_cropped_map_pos(goal_full_map)
+        if self._check_if_start_in_graph_obstacle(start):
+            self._rebuild_visgraph(start, vis)
+        coordinate = get_goal_coordinate(start, goal, self.obs_map, self.visgraph, vis)
+        coordinate[:2] = self.shift_point(coordinate[:2], self.rowmin, self.colmin)
+        return tuple(coordinate)
+
     def shift_path(self, paths: List[List[float]], row_shift: int, col_shift: int) -> List[List[float]]:
-        shifted_paths = []
-        for point in paths:
-            shifted_paths.append([point[0] + row_shift, point[1] + col_shift])
-        return shifted_paths
+        return [self.shift_point(point, row_shift, col_shift) for point in paths]
+
+    def shift_point(self, point: List[float], row_shift: int, col_shift: int) -> List[float]:
+        return [point[0] + row_shift, point[1] + col_shift]
 
     def _check_if_start_in_graph_obstacle(self, start: Tuple[float, float]):
         startvg = vg.Point(start[0], start[1])

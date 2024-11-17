@@ -1,5 +1,6 @@
 import os
 import openai
+import vlmaps.utils.prompt as prompt
 
 
 def parse_object_goal_instruction_deprecated(language_instr):
@@ -121,7 +122,32 @@ def parse_object_goal_instruction(language_instr):
     text = response.choices[0].message.content
     return [x.strip() for x in text.split(",")]
 
+def parse_object_goal_dialogue(language_instr):
+    openai_key = os.environ["OPENAI_KEY"]
+    openai.api_key = openai_key
+    client = openai.OpenAI(api_key=openai_key)
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": prompt.SYSTEM_PROMPT},
+            {"role": "user", "content": prompt.DIALOGUE_1},
+            {"role": "assistant", "content": prompt.RESPONSE_1},
+            {"role": "user", "content": prompt.DIALOGUE_2},
+            {"role": "assistant", "content": prompt.RESPONSE_2},
+            {"role": "user", "content": prompt.DIALOGUE_3},
+            {"role": "assistant", "content": prompt.RESPONSE_3},
+            {"role": "user", "content": prompt.DIALOGUE_4},
+            {"role": "assistant", "content": prompt.RESPONSE_4},
+            {"role": "user", "content": prompt.DIALOGUE_5},
+            {"role": "assistant", "content": prompt.RESPONSE_5},
+            {"role": "user", "content": language_instr},
+        ],
+        max_tokens=300,
+        response_format={ "type": "json_object" }
+    )
 
+    text = response.choices[0].message.content
+    return text
 
 def parse_spatial_instruction_deprecated(language_instr):
     """

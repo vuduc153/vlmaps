@@ -41,11 +41,12 @@ def find_similar_category_id(class_name, classes_list):
     classes_list_str = ",".join(classes_list)
     client = openai.OpenAI(api_key=openai_key)
     response = client.chat.completions.create(
-        model="gpt-4-turbo",
+        model="gpt-3.5-turbo",
         messages=[
+            {"role": "system", "content": "Answer the question only with the object name and nothing else."},
             {
                 "role": "user",
-                "content": "What is television most relevant to among tv_monitor,plant,chair",
+                "content": "What is television most similar to among tv_monitor,plant,chair",
             },
             {
                 "role": "assistant",
@@ -53,7 +54,15 @@ def find_similar_category_id(class_name, classes_list):
             },
             {
                 "role": "user",
-                "content": "What is drawer most relevant to among tv_monitor,chest_of_drawers,chair"
+                "content": "What is desk most similar to among tv_monitor,plant,chair,table",
+            },
+            {
+                "role": "assistant",
+                "content": "table"
+            },
+            {
+                "role": "user",
+                "content": "What is drawer most similar to among tv_monitor,chest_of_drawers,chair"
             },
             {
                 "role": "assistant",
@@ -61,7 +70,7 @@ def find_similar_category_id(class_name, classes_list):
             },
             {
                 "role": "user",
-                "content": f"What is {class_name} most relevant to among {classes_list_str}"
+                "content": f"What is {class_name} most similar to among {classes_list_str}"
             }
         ],
         max_tokens=300,
