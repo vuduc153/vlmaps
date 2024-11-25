@@ -10,6 +10,8 @@
 
 [Chenguang Huang](http://www2.informatik.uni-freiburg.de/~huang/), [Oier Mees](https://www.oiermees.com/), [Andy Zeng](https://andyzeng.github.io/), [Wolfram Burgard](http://www2.informatik.uni-freiburg.de/~burgard)
 
+**[See README of this fork for details about setting up VLMaps to work with the telepresence system](README2.md)**
+
 We present **VLMAPs** (**V**isual **L**anguage **Maps**),  a spatial map representation in which pretrained visuallanguage model features are fused into a 3D reconstruction of the physical
 world. Spatially anchoring visual language features enables *natural language indexing in the map*, which can be used to, e.g., localize landmarks
 or spatial references with respect to landmarks – enabling zero-shot spatial
